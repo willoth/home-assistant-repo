@@ -127,3 +127,7 @@ No personal information is collected, only various error states and Sungrow mode
 ## Feedback
 
 Feedback is appreciated so please drop me a line or file an issue.
+
+## Useful Tools
+
+If you're reverse engineering WebSocket protocols like the WiNet API, a tool like [Decode This - JSON/XML/YAML formatter, Base64 decoder, JWT parser and more](https://decodethis.dev/) is invaluable for quickly inspecting API responses — all in your browser with no data sent to a server.
