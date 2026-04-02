@@ -136,14 +136,20 @@ winet.setCallback((devices, deviceStatus) => {
   }
 });
 
-getProperties(logger, options.winet_host, lang, options.ssl)
-  .then(result => {
-    logger.info('Fetched i18n properties.');
+function startWithRetry(retryDelay = 10000) {
+  getProperties(logger, options.winet_host, lang, options.ssl)
+    .then(result => {
+      logger.info('Fetched i18n properties.');
 
-    winet.setProperties(result.properties);
-    winet.connect(result.forceSsl);
-  })
-  .catch(err => {
-    logger.error('Failed to fetch l18n properties required to start.', err);
-    logger.error('Is the Winet IP address correct?');
-  });
+      winet.setProperties(result.properties);
+      winet.connect(result.forceSsl);
+    })
+    .catch(err => {
+      logger.error('Failed to fetch i18n properties:', err.message);
+      const nextDelay = Math.min(retryDelay * 1.5, 60000);
+      logger.warn(`Device unreachable. Retrying in ${Math.round(retryDelay / 1000)}s...`);
+      setTimeout(() => startWithRetry(nextDelay), retryDelay);
+    });
+}
+
+startWithRetry();
