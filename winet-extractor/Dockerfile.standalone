@@ -7,33 +7,30 @@ FROM node:20-alpine
 ARG S6_OVERLAY_VERSION=3.1.6.2
 RUN apk add --no-cache curl \
     && curl -L "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" | tar -Jxpf - -C / \
-        && curl -L "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" | tar -Jxpf - -C /
+    && curl -L "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz" | tar -Jxpf - -C /
 
-        WORKDIR /usr/src/app
+WORKDIR /usr/src/app
 
-        # Copy package files
-        COPY package*.json ./
+# Copy everything first
+COPY . .
 
-        # Install dependencies
-        RUN npm ci
+# Install dependencies (ignore prepare script to avoid build before source is ready)
+RUN npm ci --ignore-scripts
 
-        # Copy source code
-        COPY . .
+# Now build TypeScript
+RUN npm run compile
 
-        # Build TypeScript
-        RUN npm run build
+# Create run script
+RUN echo '#!/bin/sh' > /usr/src/app/run.sh \
+    && echo 'cd /usr/src/app || exit' >> /usr/src/app/run.sh \
+    && echo 'npm run cli' >> /usr/src/app/run.sh \
+    && chmod +x /usr/src/app/run.sh
 
-        # Create run script
-        RUN echo '#!/bin/sh' > /usr/src/app/run.sh \
-            && echo 'cd /usr/src/app || exit' >> /usr/src/app/run.sh \
-                && echo 'npm run cli' >> /usr/src/app/run.sh \
-                    && chmod +x /usr/src/app/run.sh
+# Set environment defaults
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
+    S6_CMD_WAIT_FOR_SERVICES=1 \
+    S6_SERVICES_READYTIME=50
 
-                    # Set environment defaults
-                    ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
-                        S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0 \
-                            S6_CMD_WAIT_FOR_SERVICES=1 \
-                                S6_SERVICES_READYTIME=50
-
-                                ENTRYPOINT ["/init"]
-                              CMD ["/usr/src/app/run.sh"]
+ENTRYPOINT ["/init"]
+CMD ["/usr/src/app/run.sh"]
