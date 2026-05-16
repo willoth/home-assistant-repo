@@ -1,8 +1,23 @@
-# Home Assistant Repo
+# Home Assistant Repo - willoth's Fork
 
-This repository contains my Home Assistant Addons.
+This is a fork of [NickStallman/home-assistant-repo](https://github.com/NickStallman/home-assistant-repo) with standalone Docker support.
 
-[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2FNickStallman%2Fhome-assistant-repo)
+## Why this fork exists
 
-Addons:
-- [Sungrow WiNet S/WiNet S2 Extraction Tool](https://github.com/NickStallman/home-assistant-repo/tree/main/winet-extractor)
+Added standalone Docker build capability for winet-extractor that works without Home Assistant addon infrastructure.
+
+## Modifications
+
+### winet-extractor
+- **Dockerfile.standalone**: Standalone Docker build using node:20-alpine
+- **README.fork.md**: Complete documentation for standalone deployment
+- Works with standard Docker and Portainer stacks
+- No Home Assistant dependencies required
+
+## Original Addons
+
+* __[Sungrow WiNet S/WiNet S2 Extraction Tool](https://github.com/willoth/home-assistant-repo/tree/main/winet-extractor)__
+
+## Upstream
+
+Original repository: https://github.com/NickStallman/home-assistant-repo
